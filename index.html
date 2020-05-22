@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- <link rel="stylesheet" href="css/reset.css"> -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<style>
+  .main{
+    width: 500px;
+    height: 500px;
+    background-color: bisque;
+  }
+  .masu{
+    width: 150px;
+    height: 150px;
+    outline:2px solid black;
+    background-color: rgb(242, 247, 249);
+    float: left;
+    cursor: pointer;
+  }
+  .masu:hover{
+    background-color: rgb(190, 217, 239);
+  }
+  img{
+    width: 150px;
+    height: 150px;
+  }
+  .unclick{
+    pointer-events: none;
+    /* この記述でこのクラスのついているものはクリックやホバーができなくなる */
+  }
+</style>
+<body>
+
+<h1>まるばつゲーム</h1>
+
+
+<div class="main">
+<!-- <div class="masu"><img src="img/batu.png"></div>
+<div class="masu"><img src="img/maru.png"></div> -->
+</div>
+
+<!-- ターンの記述 -->
+<div class="turn-wrapper">
+  <div class="turn-container">
+    <h3>今は<p id="turn">バツ</p>の番です</h3>
+    
+  </div>
+</div>
+
+<button id="reset">やり直す</button>
+
+
+
+
+
+
+<script>
+
+let user1;
+let user2;
+let flag = false;//falseはばつのターン、trueがまるのターン
+let box;
+let masu;
+let turn;
+let myarr = [];
+let yourarr = [];
+let count = 0;
+
+
+//フィールドの用意
+for(let i =0 ; i<9; i++){
+let main = document.querySelector('.main');
+box = document.createElement('div');
+box.classList.add("masu",`masu${i}`,`${i}`);
+box.id =i;
+// console.log(box);
+main.appendChild(box);
+}
+
+
+//マスのクリックイベント
+
+masu = document.querySelectorAll('.masu');
+turn = document.querySelector('#turn');
+const masuArray = [].slice.call(masu);//これでNodelistを配列に変換
+
+
+masuArray.forEach(function(mas){
+  mas.addEventListener('click',function(){
+    count++;
+  if(flag == true){
+    // alert('まるクリック');
+    mas.classList.add('maru','unclick');
+    mas.innerHTML = '<img src="img/maru.png">';
+    turn.innerHTML = 'バツ';
+    if(judge('maru')){
+      alert('まるの勝ち');
+      fin();
+      return;
+    }
+    flag = false;
+  }else{
+    // alert('ばつクリック');
+    mas.classList.add('batu','unclick');
+    mas.innerHTML = '<img src="img/batu.png">';
+    turn.innerHTML = 'マル';
+    if(judge('batu')){
+      alert('ばつの勝ち');
+      fin();
+
+      return;
+    }
+    flag = true;
+  }
+console.log(myarr);
+console.log(yourarr);
+
+if(count ===9){
+  dorow();
+};
+
+  })
+});
+
+
+
+//勝敗判定
+ 
+
+function lines(targetArr,idArr){
+  return targetArr.filter(function(e){
+    return e.id === idArr[0] || e.id === idArr[1] || e.id === idArr[2];
+  });
+};
+
+const line1 = lines(masuArray,['0','1','2']);
+const line2 = lines(masuArray,['0','4','8']);
+const line3 = lines(masuArray,['0','3','6']);
+const line4 = lines(masuArray,['1','4','7']);
+const line5 = lines(masuArray,['2','4','6']);
+const line6 = lines(masuArray,['2','5','8']);
+const line7 = lines(masuArray,['3','4','5']);
+const line8 = lines(masuArray,['6','7','8']);
+const linesArr = [line1, line2, line3, line4, line5, line6, line7, line8];
+
+
+//マスの判定
+
+
+function judge(e){
+  const result  = linesArr.some(function(line){
+  const subResult = line.every(function(mas){
+    if (e === 'maru'){
+      return mas.classList.contains('maru');
+    }else
+    if(e === 'batu'){
+      return mas.classList.contains('batu');
+    }
+
+});
+  return subResult;
+});
+return result;
+}
+
+//引き分けの関数
+function dorow(){
+  alert('引き分け');
+}
+
+//ゲーム終了後触れなくする関数
+function fin(){
+  masuArray.forEach(function(e){
+    e.classList.add('unclick');
+  });
+};
+
+//ゲーム初期化
+const reset = document.querySelector('#reset');
+
+function initgame(){
+  flag = false;
+  count = 0;
+  masuArray.forEach(function(e){
+    e.classList.remove('maru');
+    e.classList.remove('batu');
+    e.classList.remove('unclick');
+    e.innerHTML = '';
+    turn.innerHTML = 'バツ';
+  })
+};
+
+reset.addEventListener('click',function(){
+  initgame();
+});
+
+</script>
+</body>
+</html>
